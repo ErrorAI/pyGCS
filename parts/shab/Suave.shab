@@ -1,0 +1,18 @@
+$(integrator):
+int nregions, neval, fail;
+cubareal integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+for(int i = 0; i < num_of_bins - 1 ; i++){
+G_BIN_MIN = p_bins[i];
+G_BIN_MAX = p_bins[i+1];
+
+Suave(NDIM, NCOMP, Integrand, USERDATA, NVEC,
+EPSREL, EPSABS, VERBOSE | LAST, SEED,
+MINEVAL, MAXEVAL, NNEW, NMIN, FLATNESS,
+STATEFILE, SPIN, &nregions, &neval, &fail, integral, error, prob);
+
+printf("%.3f \t%.3f \t%.20f \t%.8f \t%.3f\n",G_BIN_MIN,G_BIN_MAX,(double)integral[0], (double)error[0]/(double)integral[0]*100,(double)prob[0]);
+}
+delete [] p_kinem_var_min;
+delete [] p_kinem_var_max;
+delete [] p_bins;

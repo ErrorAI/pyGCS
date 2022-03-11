@@ -1,0 +1,3 @@
+{
+    "files": ["subWidget.ui","MainWindow.py","ComputationWidget.py","main.py","ComputationFunctional.py","Ui_ComputationWidget.py"]
+}

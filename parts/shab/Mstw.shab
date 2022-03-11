@@ -1,0 +1,22 @@
+$(include-s):
+	#include "mstwpdf.h"
+
+$(globalInit-s):
+	c_mstwpdf *mstwpdf;
+
+$(initPDFpath-s):
+	char filename[100];
+	char prefix[] = "mstwGrids/mstw2008lo";
+	sprintf(filename,"%s.%2.2d.dat",prefix,0);
+	mstwpdf = new c_mstwpdf(filename);
+
+
+$(usePDF,CPM):
+	double q = m_3T * mu_mult;
+	double parton_func_1 = exp(-pow(q_1T,2)/q2Tsr)/(PI*q2Tsr)*mstwpdf->parton(0,x_1,q)/x_1;
+	double parton_func_2 = exp(-pow(q_2T,2)/q2Tsr)/(PI*q2Tsr)*mstwpdf->parton(0,x_2,q)/x_2;
+
+$(usePDF,GPM):
+	double q = m_3T * mu_mult;
+	double parton_func_1 = exp(-pow(q_1T,2)/q2Tsr)/(PI*q2Tsr)*mstwpdf->parton(0,x_1,q)/x_1;
+	double parton_func_2 = exp(-pow(q_2T,2)/q2Tsr)/(PI*q2Tsr)*mstwpdf->parton(0,x_2,q)/x_2;

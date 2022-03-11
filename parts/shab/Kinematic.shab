@@ -1,0 +1,72 @@
+$(scaleVar-sANDjacob):
+    double q_3T = p_kinem_var_min[1] + (p_kinem_var_max[1] - p_kinem_var_min[1])*xx[0];
+    double phi_3 = 2*PI*xx[1];
+    double y_3 = p_kinem_var_min[0] + (p_kinem_var_max[0] - p_kinem_var_min[0]) * xx[2];
+    double x_1 = xx[3];
+    double q_1T = xx[4]/(1 - xx[4]);
+    double q_2T = xx[5]/(1 - xx[5]);
+    double phi_2 = 2*PI*xx[6];
+
+  double jacob = (p_kinem_var_max[1] - p_kinem_var_min[1]) *
+                (2*PI) *
+                (p_kinem_var_max[0] - p_kinem_var_min[0]) *
+                1 *
+                (1/pow(1-xx[4],2)) *
+                (1/pow(1-xx[5],2)) *
+                (2*PI);
+				
+
+$(kinematic):
+    double s = pow(sqrt_s,2);
+    double mass2 = pow(mass,2);
+    double mass4 = pow(mass,4);
+    
+    double m_3T = sqrt( pow(q_3T,2)+mass2 );
+    
+    double xi_1 = exp(y_3)*m_3T/sqrt_s;
+    double xi_2 = exp(-y_3)*m_3T/sqrt_s;
+
+    double a = pow(s*x_1,2)-pow(s,2)*x_1*xi_1;
+    double b = mass2*s*x_1 - pow(q_1T,2)*s*xi_1 - pow(s*x_1,2)*xi_2 -
+                2*q_1T*q_2T*s*x_1*cos(phi_2) +
+                2*q_2T*q_3T*s*x_1*cos(phi_3 - phi_2) +
+                2*q_1T*q_3T*s*x_1*cos(phi_3);
+    double c = pow(q_1T*q_2T,2) - pow(q_2T,2)*s*x_1*xi_2;
+
+    if( (pow(b,2)-4*a*c) <= 0 ){
+        ff[0] = 0;
+        return 0;
+    }
+
+    double x_2 = (-b+sqrt(pow(b,2)-4*a*c))/(2*a);
+    
+    double Darg = -pow(q_1T*q_2T,2)/(s*x_1*pow(x_2,2))+s*(x_1-xi_1)+
+                    pow(q_2T,2)*xi_2/pow(x_2,2);
+									
+	double AA = x_1 * sqrt_s / 2 * m_3T * exp(-y_3) + pow(q_1T,2)*m_3T*exp(y_3)/2/sqrt_s/x_1;
+    double BB = x_2 * sqrt_s / 2 * m_3T * exp(y_3) + pow(q_2T,2)*m_3T*exp(-y_3)/2/sqrt_s/x_2;
+    double phi_4 = acos( -(mass2+s_hat)/2 + AA + BB ) + phi_3;
+    double secpT = sqrt( pow(q_1T,2) + pow(q_2T,2) + 2*q_1T*q_2T*cos(phi_2) );
+    double e_1 = pow(q_1T,2)/2/sqrt_s/x_1+sqrt_s*x_1/2;
+    double e_2 = pow(q_2T,2)/2/sqrt_s/x_2+sqrt_s*x_2/2;
+    double q_1z = -pow(q_1T,2)/2/sqrt_s/x_1+sqrt_s*x_1/2;
+    double q_2z = pow(q_2T,2)/2/sqrt_s/x_2-sqrt_s*x_2/2;
+    double y_4 = 1/2*log(( e_1 + e_2 - m_3T*exp(y_3) + q_1z + q_2z )/( e_1 + e_2 - m_3T*exp(-y_3) - q_1z - q_2z ));
+
+	double s_hat = s*x_1*x_2 - 2*q_1T*q_2T*cos(phi_2) + pow(q_1T*q_2T,2)/(s*x_1*x_2);
+    double t_hat = mass2 - exp(y_3)*m_3T*pow(q_1T,2)/(sqrt_s*x_1) -
+                    exp(-y_3)*m_3T*sqrt_s*x_1 +
+                    2*q_1T*q_3T*cos(phi_3);
+    double u_hat = mass2 - exp(-y_3)*m_3T*pow(q_2T,2)/(sqrt_s*x_2) -
+                    exp(y_3)*m_3T*sqrt_s*x_2 +
+                    2*q_2T*q_3T*cos(phi_3-phi_2);
+
+    if((x_2 <= 0) || (x_2 >= 1)){
+    ff[0] = 0;
+    return 0;
+    }
+	
+	if(s_hat+t_hat+u_hat-mass2 > 1e-9){
+        ff[0] = 0;
+        return 0;
+    }

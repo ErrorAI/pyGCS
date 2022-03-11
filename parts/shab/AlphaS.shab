@@ -1,0 +1,32 @@
+$(wrapper-s):
+extern "C" {
+  void initalphas_(int *IORD, double *FR2, double *MUR, double *ASMUR,
+		   double *MC, double *MB, double *MT);
+  double alphas_(double *MUR);
+}
+inline void InitAlphaS(int IORD, double FR2, double MUR, double ASMUR,
+		       double MC, double MB, double MT) {
+  initalphas_(&IORD, &FR2, &MUR, &ASMUR,
+	      &MC, &MB, &MT);
+}
+inline double AlphaS(double MUR) {
+  return alphas_(&MUR);
+}
+
+
+
+$(useAlphaS):
+double alpha_s = AlphaS(q); //Рассчет бегущей alpha
+
+
+
+$(initInMain-s):
+double alphaSorder = 0.0;
+double alphaSQ0 = 0.68183;
+double alphaSMZ = 0.13939;
+double mCAS = 1.4;
+double mBAS = 4.75;
+double mTAS = 1.0e10;
+InitAlphaS(alphaSorder,1.0,1.0,alphaSQ0,
+mCAS,mBAS,mTAS);
+
