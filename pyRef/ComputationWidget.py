@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPalette
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QFrame, QComboBox, QLabel, QFileDialog, QGridLayout
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem
+from PyQt5.QtCore import QCoreApplication
 from ComputationFunctional import ComputationFunctional
 from Ui_ComputationWidget import Ui_ComputationWidget
 
@@ -13,8 +14,7 @@ class ComputationWidget(QtWidgets.QWidget):
         super(ComputationWidget, self).__init__()
 
         self.fullWidth = 300
-        self.fullHeight = 300
-
+        self.fullHeight = 400
         self.name = name
         self.functional = ComputationFunctional(self.name)
 
@@ -22,6 +22,8 @@ class ComputationWidget(QtWidgets.QWidget):
         self.ui.setupUi(self)
 
         self.ui.binsFileCheckBox.clicked.connect(self._binFileCheckBox_clicked)
+        self.ui.addParametersBtn.clicked.connect(self._addParametersBtn_clicked)
+        self.ui.removeParametersBtn.clicked.connect(self._removeParametersBtn_clicked)
 
         self.setGeometry(position[0], position[1], self.fullWidth, self.fullHeight)
         self.setParent(parent)
@@ -35,7 +37,10 @@ class ComputationWidget(QtWidgets.QWidget):
                 self.old_pos = event.pos()
 
     def mouseMoveEvent(self, event):
-        if not self.old_pos:
+        try:
+            if not self.old_pos:
+                return
+        except:
             return
         self.delta = event.pos() - self.old_pos
         if event.pos().y() < self.ui.nameLabel.height():
@@ -44,6 +49,15 @@ class ComputationWidget(QtWidgets.QWidget):
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.old_pos = None
+
+    def _addParametersBtn_clicked(self, event):
+        rowPosition = self.ui.parametersTableWidget.rowCount()
+        self.ui.parametersTableWidget.insertRow(rowPosition)
+
+    def _removeParametersBtn_clicked(self, event):
+        row = self.ui.parametersTableWidget.rowCount() - 1
+        self.ui.parametersTableWidget.removeRow(row)
+
 
     def _binFileCheckBox_clicked(self, event):
         if self.ui.binsDeltaLineEdit.isEnabled() == True:
